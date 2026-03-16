@@ -192,6 +192,20 @@ void PlatformConfigWidget::savePlatformConfig()
 	QDomElement propertyGroupConfigurationEle;    //<PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='XXXX|XXXX'">
 	QDomElement projectConfigurationItemEle = comm::getDomElement(projectConfigurationsItemGroup, "ItemGroup/ProjectConfiguration", "Include", projectConfigPlatform->platform); //<ProjectConfiguration Include="XXXX|XXXX">
 
+
+	if (convertPlatformConfigRadioBtn->isChecked())
+	{
+		projectConfigPlatform->conversionType = ProjectConfigPlatform::ConversionType_replace;
+	}
+	else if (deletePlatformConfigRadioBtn->isChecked())
+	{
+		projectConfigPlatform->conversionType = ProjectConfigPlatform::ConversionType_remove;
+	}
+	else if (copyPlatformtConfigConvertRadioBtn->isChecked())
+	{
+		projectConfigPlatform->conversionType = ProjectConfigPlatform::ConversionType_copyReplace;
+	}
+
 	for (int i = 0; i < propertyGroups.count(); i++)
 	{
 		QDomElement pe = propertyGroups.at(i).toElement();
@@ -221,11 +235,6 @@ void PlatformConfigWidget::savePlatformConfig()
 	{
 		QString newPlatform = projectConfigPlatform->platform;
 		newPlatform.replace(QRegExp("\\|[[a-zA-Z0-9]+"), "|x64");
-		projectConfigPlatform->conversionType = ProjectConfigPlatform::ConversionType_replace;
-		if (copyPlatformtConfigConvertRadioBtn->isChecked())
-		{
-			projectConfigPlatform->conversionType = ProjectConfigPlatform::ConversionType_copyReplace;
-		}
 
 		//复制或转换前先查找是不是已经有了 有的话直接在目标配置上进行修改
 		QDomElement newPropertyGroupConfigurationEle, newPropertyGroupEle, newProjectConfigurationItemEle;
@@ -319,9 +328,8 @@ void PlatformConfigWidget::savePlatformConfig()
 		
 	}
 
-	if (deletePlatformConfigRadioBtn->isChecked())//删除平台配置
+	if (projectConfigPlatform->conversionType == ProjectConfigPlatform::ConversionType_remove)//删除平台配置
 	{
-		projectConfigPlatform->conversionType = ProjectConfigPlatform::ConversionType_remove;
 		propertyGroupEle.parentNode().removeChild(propertyGroupEle);
 		propertyGroupConfigurationEle.parentNode().removeChild(propertyGroupConfigurationEle);
 		projectConfigurationItemEle.parentNode().removeChild(projectConfigurationItemEle);
