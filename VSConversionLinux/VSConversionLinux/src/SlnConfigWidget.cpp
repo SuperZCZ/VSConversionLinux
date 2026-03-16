@@ -109,7 +109,7 @@ PlatformConfigWidget::PlatformConfigWidget(ProjectConfigPlatform *_projConfigPla
 	configureProjectVLay->setContentsMargins(5, 0, 5, 5);
 	configureProjectVLay->setSpacing(5);
 
-	includeDirListLineEditWidget = new ListLineViewEditWidget(trUtf8("包含目录"), ";", ListEditType_Path);
+	includeDirListLineEditWidget = new ListLineViewEditWidget(trUtf8("包含目录"), ";", ListEditType_Dir);
 	includeDirListLineEditWidget->setPwd(projectConfigPlatform->vsProject->projectDir);
 	configureProjectVLay->addWidget(includeDirListLineEditWidget);
 
