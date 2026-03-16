@@ -1,0 +1,35 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/error.png</file>
+        <file>images/information.png</file>
+        <file>images/inquiry.png</file>
+        <file>images/warning.png</file>
+        <file>images/loading.gif</file>
+        <file>qss/SlnConfigWidget.qss</file>
+        <file>qss/VSConversionLinuxWidget.qss</file>
+        <file>images/hamburg.png</file>
+        <file>images/down_arrow.png</file>
+        <file>images/down_arrow_gray.png</file>
+        <file>images/up_arrow.png</file>
+        <file>images/up_arrow_gray.png</file>
+        <file>images/eject_down.png</file>
+        <file>images/eject_down_gray.png</file>
+        <file>images/eject_up.png</file>
+        <file>images/eject_up_gray.png</file>
+        <file>images/list_add.png</file>
+        <file>images/list_add_gray.png</file>
+        <file>images/list_del.png</file>
+        <file>images/list_del_gray.png</file>
+        <file>images/edit.png</file>
+        <file>images/edit_gray.png</file>
+        <file>images/down.png</file>
+        <file>images/down_gray.png</file>
+        <file>images/up.png</file>
+        <file>images/up_gray.png</file>
+        <file>qss/ListLineViewEditWidget.qss</file>
+        <file>images/open_file.png</file>
+        <file>images/open_file_gray.png</file>
+        <file>images/open_file_hover.png</file>
+        <file>images/logo.png</file>
+    </qresource>
+</RCC>

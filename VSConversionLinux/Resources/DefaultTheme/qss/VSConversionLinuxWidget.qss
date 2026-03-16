@@ -1,0 +1,38 @@
+QStackedWidget#SlnInfoStackWidget {
+	border: 1px solid gray;
+	background-color: white;
+}
+
+
+QLabel#ParseStatusImageLabel{
+    min-height: 50px;
+	max-height: 50px;
+	min-width: 130px;
+	max-width: 130px;
+    border: none;
+}
+
+QLabel#ParseStatusTextLabel{
+    border: none;
+    font: bold 14px;
+}
+
+QTextBrowser#ParseStatusDetailBrowser
+{
+    border: none;
+    min-height: 100px;
+	max-height: 100px;
+	min-width: 350px;
+	max-width: 350px;
+    font-style: italic;
+    font-size: 12px;
+}
+
+QScrollArea#SlnConfigScrollArea{
+    border: none;
+    background-color: transparent;
+}
+
+QTextBrowser#PromptInfoTextBrowser{
+    border: none;
+}
