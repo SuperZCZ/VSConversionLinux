@@ -20,6 +20,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
+#include <QComboBox>
 #include "VSConversionLinuxGlobal.h"
 #include "PainterWidget.h"
 #include "SignalController.h"
@@ -65,9 +66,15 @@ private:
 	QVBoxLayout *vAllLay;
 	QVector<PlatformConfigWidget *> projectConfigWidgetVec;
 	VsProject *vsProject;
+	QHBoxLayout *clangModeHLay;
+	QCheckBox *clangModeCheckBox;
+	QCheckBox *enableAllWaringCheckBox;
+	QComboBox *cLanguageStandardComboBox;
+	QComboBox *cppLanguageStandardComboBox;
 
 public slots:
 	void saveProjectConfig();
+	void clangModeToggled(bool checked);
 };
 
 

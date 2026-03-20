@@ -9,7 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>F:\WorkSpace\Test\ConversionTest\LinuxProject7\LinuxProject7.sln</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>F:\WorkSpace\Test\LinuxProject1\LinuxProject1.sln</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

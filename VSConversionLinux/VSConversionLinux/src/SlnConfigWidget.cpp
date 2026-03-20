@@ -36,7 +36,61 @@ ProjectConfigGroupBox::ProjectConfigGroupBox(VsProject *_vsProject, QWidget *par
 		vAllLay->addWidget(platformConfigWidget);
 		projectConfigWidgetVec.append(platformConfigWidget);
 	}
+	clangModeHLay = new QHBoxLayout;
+	clangModeCheckBox = new QCheckBox(trUtf8("ClangMode"), this);
+	enableAllWaringCheckBox = new QCheckBox(trUtf8("启用警告"), this);
+	cLanguageStandardComboBox = new QComboBox(this);
+	cLanguageStandardComboBox->addItems(QStringList() << "c89" << "c99" << "c11" << "gnu99" << "gnu11");
+	cLanguageStandardComboBox->setToolTip(trUtf8("c89->/Clangstdc89 \nc99->/Clangstdc99 \nc11->/Clangstdc11 \ngnu99->/Clangstdc99 \ngnu11->/Clangstdc11"));
+	cppLanguageStandardComboBox = new QComboBox(this);
+	cppLanguageStandardComboBox->addItems(QStringList() << "c++98" << "c++03" << "c++11" << "c++14" << "c++17" << "c++20" << "gnu++98" << "gnu++03" << "gnu++11" << "gnu++1y");
+	cppLanguageStandardComboBox->setToolTip(trUtf8("c++98->/Clangstdc++03 \nc++03->/Clangstdc++03 \nc++11->/Clangstdc++11 \nc++14->/Clangstdc++14 \nc++17->/Clangstdc++17 \nc++20->/Clangstdc++20 \n"
+		"gnu++98->/Clangstdc++03 \ngnu++03->/Clangstdc++03 \ngnu++11->/Clangstdc++11 \ngnu++1y->/Clangstdc++14"));
+
+
+	cLanguageStandardComboBox->setCurrentText("c11");
+	cppLanguageStandardComboBox->setCurrentText("c++11");
+	if (comm::getDomElementText(*vsProject->projectDomDocument, "Project/ItemDefinitionGroup/ClCompile/ClangMode") == "true")
+	{
+		clangModeCheckBox->setChecked(true);
+	}
+	else
+	{
+		clangModeCheckBox->setChecked(false);
+	}
+	if (comm::getDomElementText(*vsProject->projectDomDocument, "Project/ItemDefinitionGroup/ClCompile/WarningLevel") == "EnableAllWarnings")
+	{
+		enableAllWaringCheckBox->setChecked(true);
+	}
+	else
+	{
+		enableAllWaringCheckBox->setChecked(false);
+	}
+	QString cLanguageStandard = comm::getDomElementText(*vsProject->projectDomDocument, "Project/ItemDefinitionGroup/ClCompile/CLanguageStandard");
+	QString cppLanguageStandard = comm::getDomElementText(*vsProject->projectDomDocument, "Project/ItemDefinitionGroup/ClCompile/CppLanguageStandard");
+	if (!cLanguageStandard.isEmpty())
+	{
+		cLanguageStandardComboBox->setCurrentText(cLanguageStandard);
+	}
+	if (!cppLanguageStandard.isEmpty())
+	{
+		cppLanguageStandardComboBox->setCurrentText(cppLanguageStandard);
+	}
+	enableAllWaringCheckBox->setEnabled(clangModeCheckBox->isChecked());
+	cLanguageStandardComboBox->setEnabled(clangModeCheckBox->isChecked());
+	cppLanguageStandardComboBox->setEnabled(clangModeCheckBox->isChecked());
+
+
+	clangModeHLay->addWidget(clangModeCheckBox);
+	clangModeHLay->addWidget(enableAllWaringCheckBox);
+	clangModeHLay->addWidget(cLanguageStandardComboBox);
+	clangModeHLay->addWidget(cppLanguageStandardComboBox);
+	clangModeHLay->setAlignment(Qt::AlignLeft);
+	vAllLay->addLayout(clangModeHLay);
+
 	setObjectName("ProjectConfigGroupBox");
+
+	connect(clangModeCheckBox, SIGNAL(toggled(bool)), this, SLOT(clangModeToggled(bool)));
 }
 
 ProjectConfigGroupBox::~ProjectConfigGroupBox()
@@ -58,6 +112,7 @@ void ProjectConfigGroupBox::saveProjectConfig()
 		}
 	}
 	QDomDocument projectDomDoc = *(vsProject->projectDomDocument);
+	QDomElement projectEle = comm::getDomElement(projectDomDoc, "Project");
 	QDomElement globalsPropertyGroupEle = comm::getDomElement(projectDomDoc, "Project/PropertyGroup", "Label", "Globals");
 	if (hasPlatformConversion && !globalsPropertyGroupEle.isNull())
 	{
@@ -70,9 +125,86 @@ void ProjectConfigGroupBox::saveProjectConfig()
 		comm::setDomElementText(globalsPropertyGroupEle, "PropertyGroup/ApplicationType", "Linux");
 	}
 
+	QDomElement itemDefinitionGroupEle = comm::getDomElement(projectDomDoc, "Project/ItemDefinitionGroup");
+	if (itemDefinitionGroupEle.isNull())
+	{
+		itemDefinitionGroupEle = projectDomDoc.createElement("ItemDefinitionGroup");
+		QDomElement lastPropertyGroupEle = projectEle.lastChildElement("PropertyGroup");
+		if (!lastPropertyGroupEle.isNull())
+		{
+			projectEle.insertAfter(itemDefinitionGroupEle, lastPropertyGroupEle);
+		}
+		else
+		{
+			projectEle.appendChild(itemDefinitionGroupEle);
+		}
+	}
+	if (clangModeCheckBox->isChecked())
+	{
+		//添加相关选项
+		QDomElement ClCompileEle = itemDefinitionGroupEle.firstChildElement("ClCompile");
+		if (ClCompileEle.isNull())
+		{
+			ClCompileEle = projectDomDoc.createElement("ClCompile");
+			itemDefinitionGroupEle.appendChild(ClCompileEle);
+		}
+
+		QDomElement ClangModeEle= ClCompileEle.firstChildElement("ClangMode");
+		if (ClangModeEle.isNull())
+		{
+			ClangModeEle = projectDomDoc.createElement("ClangMode");
+			ClCompileEle.appendChild(ClangModeEle);
+		}
+		comm::setDomElementText(ClangModeEle, "ClangMode", "true");
+
+		if (enableAllWaringCheckBox->isChecked())
+		{
+			QDomElement WarningLevelEle = ClCompileEle.firstChildElement("WarningLevel");
+			if (WarningLevelEle.isNull())
+			{
+				WarningLevelEle = projectDomDoc.createElement("WarningLevel");
+				ClCompileEle.appendChild(WarningLevelEle);
+			}
+			comm::setDomElementText(WarningLevelEle, "WarningLevel", "EnableAllWarnings");
+		}
+		else
+		{
+			ClCompileEle.removeChild(ClCompileEle.firstChildElement("WarningLevel"));
+		}
+
+		QDomElement CLanguageStandardEle = ClCompileEle.firstChildElement("CLanguageStandard");
+		if (CLanguageStandardEle.isNull())
+		{
+			CLanguageStandardEle = projectDomDoc.createElement("CLanguageStandard");
+			ClCompileEle.appendChild(CLanguageStandardEle);
+		}
+		comm::setDomElementText(CLanguageStandardEle, "CLanguageStandard", cLanguageStandardComboBox->currentText());
+
+		QDomElement CppLanguageStandardEle = ClCompileEle.firstChildElement("CppLanguageStandard");
+		if (CppLanguageStandardEle.isNull())
+		{
+			CppLanguageStandardEle = projectDomDoc.createElement("CppLanguageStandard");
+			ClCompileEle.appendChild(CppLanguageStandardEle);
+		}
+		comm::setDomElementText(CppLanguageStandardEle, "CppLanguageStandard", cppLanguageStandardComboBox->currentText());
+	}
+	else
+	{
+		//清除相关选项
+		itemDefinitionGroupEle.removeChild(itemDefinitionGroupEle.firstChildElement("ClCompile"));
+	}
+
+
 	vsProject->saveFlag = true; //更新保存标识
 	//comm::saveDomDocument(*(vsProject->projectDomDocument), vsProject->path, true);
 	//qDebug() << "Save ------ " << vsProject->path;
+}
+
+void ProjectConfigGroupBox::clangModeToggled(bool checked)
+{
+	enableAllWaringCheckBox->setEnabled(checked);
+	cLanguageStandardComboBox->setEnabled(checked);
+	cppLanguageStandardComboBox->setEnabled(checked);
 }
 
 PlatformConfigWidget::PlatformConfigWidget(ProjectConfigPlatform *_projConfigPlatform, QWidget *parent /*= nullptr*/):PainterWidget(parent)
