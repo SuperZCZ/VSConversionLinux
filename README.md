@@ -1,6 +1,6 @@
 # Visual Studio 项目转换 Linux Project
 
-**将现有的VisualGDB工程转换为Linux项目类型以加强intellisense支持而不改变VisualGDB项目属性**
+**将现有的VisualGDB GNU Make工程转换为Linux项目类型以加强intellisense支持而不改变VisualGDB项目属性**
 
 ​        当创建VisualGDB Linux 应用程序项目时，VisualGDB会默认创建一个基于Win32的项目文件（.vcxproj）  
 而不是基于Linux的项目文件。当使用Visual Studio 的IntelliSense而不是VisualGDB的Clangd引擎进行解析时  
